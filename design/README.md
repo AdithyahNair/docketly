@@ -1,123 +1,123 @@
 # Docketly Design System
 
-The single reference for how the dashboard looks and why. The system has four
-layers, lowest to highest; each layer only consumes the ones below it.
+The single reference for how the dashboard looks and why. The current look is
+the **Docketly Redesign**: a warm Notion/Attio-style light theme from the
+Claude Design handoff (chat brief: "Series-A polish, soft, warm, friendly").
+
+The system has four layers, lowest to highest; each layer only consumes the
+ones below it.
 
 ```
-1. Theme        app/globals.css           CSS variables (oklch), radius, dark variant
+1. Theme        app/globals.css           CSS variables (warm hex palette), radius, font
 2. Primitives   components/ui/*           shadcn/ui components, styled by the theme
 3. Tokens       design/tokens.ts          semantic recipes: tones, status mapping, typography
-4. Patterns     design/patterns/*         reusable compositions: PageHeader, EmptyState, Field, GateBadge
+4. Patterns     design/patterns/*         PageHeader, EmptyState, Field, GateBadge, Confidence, Callout
                 components/*              app composites: StatusBadge, SidebarNav, forms
 ```
 
 Pages under `app/(dashboard)/` compose layers 2–4 and add layout only. If a
-page needs a raw palette class (`bg-amber-100`…), that's a signal the token
-layer is missing something — add it there instead.
+page needs a raw palette class, that's a signal the token layer is missing
+something — add it there instead.
 
 ---
 
 ## 1. Theme (`app/globals.css`)
 
-Tailwind v4 with the shadcn "new-york" style, **neutral** base color, CSS
-variables in oklch. Key values:
+Tailwind v4, light-only (a class-based dark variant exists but no dark
+palette is defined — that's intentional, per the design brief). Typeface:
+**Instrument Sans** via `next/font`, 14px base. Radius: 10px.
 
-| Variable | Light | Meaning |
+### Ink scale (warm grays)
+
+| Variable | Value | Use |
 |---|---|---|
-| `--background` / `--foreground` | white / near-black | page canvas |
-| `--muted` / `--muted-foreground` | neutral-50-ish / mid-gray | quiet surfaces, secondary text |
-| `--primary` | near-black | the one strong action per view |
-| `--destructive` | red (oklch 0.577 0.245 27) | errors and dangerous actions |
-| `--border` / `--input` / `--ring` | light neutrals | hairlines, fields, focus |
-| `--sidebar-*` | near-white set | the nav rail |
-| `--radius` | 0.625rem | global corner radius (sm/md/lg/xl derive from it) |
+| `--ink` (= `--foreground`) | `#33312D` | primary text, primary buttons |
+| `--ink-2` | `#74726C` | secondary text, table headers |
+| `--ink-3` | `#A8A59E` | placeholders, icons at rest |
 
-Dark mode: a full `.dark` variable set exists and primitives honor it, but
-**no toggle is shipped** — the dashboard currently renders light-only. Adding
-a toggle is a theme-layer change; no component would need editing.
+### Surfaces & lines
 
-Fonts: system stack (no webfont). Icons: `lucide-react`, almost always
-`h-4 w-4`.
+| Variable | Value | Use |
+|---|---|---|
+| `--background` | `#FFFFFF` | page + cards |
+| `--sidebar` | `#F7F6F3` | the nav rail, callout blocks |
+| `--muted` | `#F2F1ED` | hover fills |
+| `--accent` | `#ECEAE4` | active/selected fills |
+| `--raised` | `#FBFAF8` | table headers, row hover, source blocks |
+| `--border` | `#E8E6E1` | card borders, hairlines |
+| `--input` | `#DCDAD3` | form-control borders (stronger) |
+| `--row-line` | `#F1F0EC` | between table rows (quieter) |
+
+### The accent
+
+`--brand: #2383E2` (Notion blue). Used for: focus rings (`--ring`), switch
+on-state, token keys in the reference panel, selected role chips, text
+selection. **Not** used for primary buttons — those are `--ink` (charcoal),
+per the design.
+
+### Status colors (soft pills)
+
+| | bg | ink |
+|---|---|---|
+| green | `#DEECDF` | `#2B5C3C` |
+| amber | `#FAEEDB` | `#8A5A22` |
+| red | `#FAE3E3` | `#A13E3E` |
+| blue | `#E2EEF9` | `#2B5E8E` |
 
 ## 2. Primitives (`components/ui/`)
 
-Generated via shadcn CLI — treat as vendored, edit rarely:
-
-`badge` `button` `card` `dialog` `input` `label` `select` `switch` `table`
-`tabs` `textarea`
-
-Add new ones with `npx shadcn@latest add <name>` (config in
-`components.json`: RSC on, alias `@/components/ui`, neutral palette, CSS
-variables). Note: `tabs` is installed but the Notices filter intentionally
-uses **links styled as tabs** instead, so filter state lives in the URL and
-works in server components.
+shadcn "new-york", themed by the variables above. Two carry deliberate local
+edits: `table.tsx` (raised header band, 13.5px cells, `row-line` hairlines,
+`raised` hover) and `switch.tsx` (checked state is `brand`, not primary).
+The rest are stock. Add new ones with `npx shadcn@latest add <name>`.
 
 ## 3. Tokens (`design/tokens.ts`)
 
-### Tones — the five semantic colors
-
-| Tone | Classes | Means |
-|---|---|---|
-| `info` | blue 100/800 | in flight, give it a moment |
-| `success` | green 100/800 | done, handled |
-| `warning` | amber 100/800 | needs a human |
-| `danger` | red 100/800 | went wrong |
-| `neutral` | neutral 100/600 | intentionally skipped |
-
-### Status → tone (`STATUS_TONE`)
-
-Notice statuses and automation-run statuses share one badge language:
-
-| Status | Tone | | Status | Tone |
-|---|---|---|---|---|
-| `classifying` | info | | `pending` | info |
-| `classified` | success | | `sent` | success |
-| `needs_review` | warning | | `skipped` | neutral |
-| `failed` | danger | | | |
-
-`STATUS_LABEL` holds display overrides (`needs_review` → "needs review").
-Render statuses **only** through `<StatusBadge>` (`components/status-badge.tsx`),
-which consumes these maps — never hand-roll a status color.
-
-### Typography recipes (`TEXT`)
-
-| Recipe | Use |
-|---|---|
-| `pageTitle` | the h1 on every dashboard page |
-| `pageSubtitle` | the one-liner under it |
-| `fieldLabel` | uppercase micro-label over read-only values |
-| `identifier` | case numbers, run ids — always mono |
-| `reasoning` | the AI's sentence — always italic muted |
-| `sourceText` | raw notice text — mono on muted, pre-wrapped |
+- `TONES` — the five semantic colors as soft pills: `info` (blue, in
+  flight), `success` (green, done), `warning` (amber, needs a human),
+  `danger` (red, went wrong), `neutral` (muted, intentionally skipped).
+- `STATUS_TONE` / `STATUS_LABEL` — notice + run statuses → tone and
+  sentence-case display label. Render statuses **only** through
+  `<StatusBadge>` (`components/status-badge.tsx`): a rounded-full pill with
+  a leading dot.
+- `TEXT` — typography recipes with the design's exact px values:
+  `pageTitle` (22px/650/-0.012em), `pageSubtitle`, `fieldLabel` (13px/550),
+  `fieldHint`, `identifier` (mono 12.5px tabular), `cardTitle`, `cardSub`,
+  `sourceText` (mono on raised).
 
 ## 4. Patterns (`design/patterns/`)
 
 | Pattern | Used for |
 |---|---|
-| `PageHeader` | title + subtitle + optional action slot, on all five pages |
-| `EmptyState` | the dashed teaching box (PRD §8: "empty states teach") |
-| `Field` | labeled read-only value in the classification panel |
-| `GateBadge` | a "held because" reason — always warning tone, because a failed gate is a request for judgment, not an error |
+| `PageHeader` | title + subtitle/chips + action slot, on every page |
+| `EmptyState` | teaching empty box: icon circle, bold title, quiet line — always inside a Card |
+| `Field` | labeled read-only value (notice detail) |
+| `GateBadge` | "held because" reason — amber, **squared** corners (status pills are round) |
+| `Confidence` | 44×4 mini-bar + % + note; amber fill below the 0.8 gate |
+| `Callout` | AI-authored text (reasoning, eval notes): ivory block + sparkle |
 
-App-level composites in `components/`: `StatusBadge` (the only status
-renderer), `SidebarNav` (client; the Review count chip), `AutomationForm`
-(the token-reference + live-preview editor), `ReviewForm`, `UploadButton`,
-`AutomationToggle`.
+App composites in `components/`: `StatusBadge`, `SidebarNav` (workspace
+rail items + amber review count), `AutomationForm` (two-column editor with
+token reference + live preview), `ReviewForm` (owns the review page: actions
+live in its header), `UploadButton`, `AutomationToggle`.
 
 ---
 
 ## Rules of thumb
 
-1. **Meaning flows through tones.** New state to display? Map it to one of
-   the five tones in `tokens.ts`; don't introduce a sixth color casually.
-2. **Status rendering has one door**: `<StatusBadge status={...}>`.
-3. **Every list page ships its empty state**, written to teach the next
-   action, via `<EmptyState>`.
-4. **Tables are the default surface** for collections; cards for the
-   side-by-side document/classification split; dialogs sparingly (currently
-   unused — full pages over modals for anything with a URL worth sharing).
-5. **Server components by default**; a component goes `"use client"` only
-   for state or browser APIs (forms, toggles, uploads, nav highlighting).
-6. **Clickable table rows** use the in-cell `<Link>` + absolute-overlay span
-   idiom (see `notices/page.tsx`) so the whole row is a target without
-   nesting interactive elements.
+1. **Meaning flows through tones**; don't introduce a sixth color casually.
+2. **Status rendering has one door**: `<StatusBadge>`. Reasons are
+   `<GateBadge>`, never status pills.
+3. **Primary buttons are charcoal, the accent is blue.** One dark button per
+   view; secondary actions are outline.
+4. **Tables live inside `<Card className="overflow-hidden p-0 …">`** so the
+   raised header band meets the card edge.
+5. **Every list page ships its teaching `<EmptyState>`.**
+6. **Case numbers and ids are always `TEXT.identifier`** (mono, tabular).
+7. **Server components by default**; `"use client"` only for state or
+   browser APIs.
+8. **Clickable table rows** use the in-cell `<Link>` + absolute-overlay span
+   idiom (see `notices/page.tsx`).
+9. The sidebar's ⌘K search is a **visual affordance only** (per the design
+   prototype); wire it to a real command palette before making it prominent
+   in demos.
