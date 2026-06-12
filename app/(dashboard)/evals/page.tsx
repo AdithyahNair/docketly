@@ -79,6 +79,22 @@ export default async function EvalsPage() {
     <div>
       <PageHeader title="Evals" subtitle={SUBTITLE} />
 
+      <div className="mb-5">
+        <Callout>
+          <b>How this is measured:</b> each example in the test set is a real notice
+          with the correct answers recorded by a person. Running{" "}
+          <code className="font-mono text-xs">npm run eval</code> has Docketly re-read
+          every example from scratch and compares its answers — notice type, chapter,
+          case number, judge — against the human answers. A score counts only if all
+          four match exactly. <b>Precision</b>: when Docketly says a notice is this
+          type, how often is it right? <b>Recall</b>: of all notices that truly are
+          this type, how many did it find? <b>n</b> is how many examples of that type
+          are in the test set. Every correction made in Review is added to the test
+          set, so the score is always checked against the mistakes humans actually
+          caught.
+        </Callout>
+      </div>
+
       <div className="grid items-start gap-5 lg:grid-cols-[1fr_1.55fr]">
         <div className="flex flex-col gap-5">
           <Card className="block p-5">

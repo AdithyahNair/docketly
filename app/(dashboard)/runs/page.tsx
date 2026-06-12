@@ -99,14 +99,21 @@ export default async function RunsPage() {
                     <TableCell>
                       <StatusBadge status={r.status} />
                     </TableCell>
-                    <TableCell
-                      className={`max-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${
-                        r.status === "failed" ? "text-status-red-ink" : "text-ink-2"
-                      } ${TEXT.identifier}`}
-                    >
-                      {r.status === "failed"
-                        ? r.error
-                        : r.resend_email_id && `Resend: ${r.resend_email_id}`}
+                    <TableCell className="whitespace-normal">
+                      {r.status === "failed" ? (
+                        <span className="block text-[12.5px] leading-relaxed text-status-red-ink">
+                          {r.error}
+                        </span>
+                      ) : r.status === "sent" ? (
+                        <span
+                          className="text-[12.5px] text-ink-2"
+                          title={r.resend_email_id ? `Delivery id ${r.resend_email_id}` : undefined}
+                        >
+                          Delivered
+                        </span>
+                      ) : (
+                        <span className="text-[12.5px] text-ink-3">—</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { Search } from "lucide-react";
 import { requireUser } from "@/lib/supabase-server";
 import { userClient } from "@/lib/supabase-server";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { CommandPalette } from "@/components/command-palette";
 
 async function signOut() {
   "use server";
@@ -39,13 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
 
-        <div className="mx-0.5 mb-1 mt-2.5 flex items-center gap-2 rounded-lg border bg-background px-2.5 py-1.5 text-[13px] text-ink-3 shadow-[0_1px_2px_rgba(28,26,21,0.03)]">
-          <Search className="h-3.5 w-3.5" strokeWidth={1.7} />
-          <span>Search</span>
-          <kbd className="ml-auto rounded bg-muted px-[5px] py-px font-sans text-[11px] text-ink-3">
-            ⌘K
-          </kbd>
-        </div>
+        <CommandPalette />
 
         <SidebarNav reviewCount={reviewCount ?? 0} />
 

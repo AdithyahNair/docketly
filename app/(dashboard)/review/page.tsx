@@ -87,8 +87,10 @@ export default async function ReviewPage() {
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-ink-2">
-                      {c?.reasoning ?? ""}
+                    <TableCell className="whitespace-normal text-ink-2">
+                      <span className="line-clamp-3 text-[12.5px] leading-relaxed">
+                        {c?.reasoning ?? ""}
+                      </span>
                     </TableCell>
                   </TableRow>
                 );
