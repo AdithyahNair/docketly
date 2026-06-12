@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase-server";
 import { adminClient } from "@/lib/supabase";
 import { gateFailures } from "@/lib/gates";
 import { fmtConfidence, fmtDateTime } from "@/lib/format";
 import type { Classification } from "@/lib/types";
+import { TEXT } from "@/design/tokens";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Callout } from "@/design/patterns/callout";
+import { Field } from "@/design/patterns/field";
 import {
   Table,
   TableBody,
@@ -16,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Field } from "@/design/patterns/field";
 import { retryNotice } from "../actions";
 
 export default async function NoticeDetailPage({
@@ -52,22 +55,27 @@ export default async function NoticeDetailPage({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <Link href="/notices" className="text-sm text-muted-foreground hover:underline">
-            ← Notices
-          </Link>
-          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight">
+    <div>
+      <Link
+        href="/notices"
+        className="-ml-2 mb-2.5 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] font-medium text-ink-2 hover:bg-muted hover:text-ink"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.7} />
+        Notices
+      </Link>
+
+      <div className="mb-6 flex items-start justify-between gap-6">
+        <div>
+          <h1 className={`${TEXT.pageTitle} flex items-center gap-3`}>
             {c?.notice_type ?? "Unclassified notice"}
             <StatusBadge status={notice.status} />
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className={TEXT.pageSubtitle}>
             Received {fmtDateTime(notice.created_at)} via {notice.source}
             {notice.reviewed_at && ` · reviewed ${fmtDateTime(notice.reviewed_at)}`}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           {notice.status === "failed" && (
             <form
               action={async () => {
@@ -86,120 +94,117 @@ export default async function NoticeDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Source text</CardTitle>
+      <div className="grid items-start gap-5 lg:grid-cols-2">
+        <Card className="block p-5">
+          <div className={TEXT.cardTitle}>Source text</div>
+          <div className={`${TEXT.cardSub} mb-3.5`}>
+            Raw text from the ingested document.
             {pdfUrl && (
-              <a
-                href={pdfUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-muted-foreground underline"
-              >
-                Open PDF
-              </a>
+              <>
+                {" "}
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-brand hover:underline"
+                >
+                  Open PDF
+                </a>
+              </>
             )}
-          </CardHeader>
-          <CardContent>
-            <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-4 font-mono text-xs leading-relaxed">
-              {notice.raw_text}
-            </pre>
-          </CardContent>
+          </div>
+          <div className={`${TEXT.sourceText} max-h-[32rem] overflow-auto`}>
+            {notice.raw_text}
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Classification</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {c ? (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Notice type" value={c.notice_type} />
-                  <Field label="Chapter" value={c.chapter ? `Chapter ${c.chapter}` : "—"} />
-                  <Field
-                    label="Case number"
-                    value={
-                      <span className="font-mono">
-                        {c.case_number ?? "—"}
-                        {notice.cases && (
-                          <span className="ml-2 font-sans text-muted-foreground">
-                            {notice.cases.client_name}
-                          </span>
-                        )}
-                      </span>
-                    }
-                  />
-                  <Field label="Judge initials" value={c.judge_initials ?? "—"} />
-                  <Field label="Hearing" value={fmtDateTime(c.hearing_datetime)} />
-                  <Field
-                    label="Confidence"
-                    value={
-                      <span>
-                        {fmtConfidence(c.confidence)}{" "}
-                        <span className="text-xs text-muted-foreground">
-                          {failures.length === 0 ? "all gates passed" : failures.join(", ")}
+        <Card className="block p-5">
+          <div className={TEXT.cardTitle}>Classification</div>
+          <div className={`${TEXT.cardSub} mb-3.5`}>
+            {c
+              ? failures.length === 0
+                ? "All gates passed."
+                : `Held: ${failures.join(" · ")}`
+              : "Not classified yet."}
+          </div>
+          {c ? (
+            <>
+              {c.reasoning && (
+                <div className="mb-[18px]">
+                  <Callout>
+                    <b>AI confidence {fmtConfidence(c.confidence)}</b> — {c.reasoning}
+                  </Callout>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-x-5 gap-y-4">
+                <Field label="Notice type" value={c.notice_type} />
+                <Field label="Chapter" value={c.chapter ? `Chapter ${c.chapter}` : "—"} />
+                <Field
+                  label="Case number"
+                  value={
+                    <span className={TEXT.identifier}>
+                      {c.case_number ?? "—"}
+                      {notice.cases && (
+                        <span className="ml-2 font-sans text-ink-2">
+                          {notice.cases.client_name}
                         </span>
-                      </span>
-                    }
-                  />
-                </div>
-                <div>
-                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    AI reasoning
-                  </div>
-                  <p className="text-sm italic text-muted-foreground">{c.reasoning}</p>
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Not classified yet. The pipeline updates this row when classification
-                completes.
-              </p>
-            )}
-          </CardContent>
+                      )}
+                    </span>
+                  }
+                />
+                <Field label="Judge initials" value={c.judge_initials ?? "—"} />
+                <Field label="Hearing" value={fmtDateTime(c.hearing_datetime)} />
+                <Field label="Confidence" value={fmtConfidence(c.confidence)} />
+              </div>
+            </>
+          ) : (
+            <p className="text-[13.5px] text-ink-2">
+              The pipeline updates this panel when classification completes.
+            </p>
+          )}
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Automation runs for this notice</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!runs?.length ? (
-            <p className="text-sm text-muted-foreground">
-              No automations have fired for this notice.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Automation</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Detail</TableHead>
+      <Card className="mt-5 overflow-hidden p-0 shadow-[0_1px_2px_rgba(28,26,21,0.04)]">
+        <div className="p-5 pb-2">
+          <div className={TEXT.cardTitle}>Automation runs for this notice</div>
+        </div>
+        {!runs?.length ? (
+          <p className="px-5 pb-5 text-[13.5px] text-ink-2">
+            No automations have fired for this notice.
+          </p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Time</TableHead>
+                <TableHead>Automation</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Detail</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {runs.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="text-ink-2">{fmtDateTime(r.created_at)}</TableCell>
+                  <TableCell className="font-medium">
+                    {(r.automations as unknown as { name: string } | null)?.name ?? "—"}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={r.status} />
+                  </TableCell>
+                  <TableCell
+                    className={`max-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${
+                      r.status === "failed" ? "text-status-red-ink" : "text-ink-2"
+                    } ${TEXT.identifier}`}
+                  >
+                    {r.status === "failed" ? r.error : (r.resend_email_id ?? "")}
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {runs.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell>{fmtDateTime(r.created_at)}</TableCell>
-                    <TableCell>
-                      {(r.automations as unknown as { name: string } | null)?.name ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={r.status} />
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {r.status === "failed" ? r.error : (r.resend_email_id ?? "")}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Card>
     </div>
   );

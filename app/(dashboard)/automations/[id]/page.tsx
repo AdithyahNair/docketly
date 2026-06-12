@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase-server";
 import type { AutomationRow } from "@/lib/types";
 import { AutomationForm } from "@/components/automation-form";
@@ -17,14 +18,19 @@ export default async function EditAutomationPage({
   const automation = data as AutomationRow;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <Link href="/automations" className="text-sm text-muted-foreground hover:underline">
-          ← Automations
-        </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">{automation.name}</h1>
-      </div>
-      <AutomationForm initial={automation} action={updateAutomation.bind(null, id)} />
+    <div>
+      <Link
+        href="/automations"
+        className="-ml-2 mb-2.5 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] font-medium text-ink-2 hover:bg-muted hover:text-ink"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.7} />
+        Automations
+      </Link>
+      <AutomationForm
+        title={automation.name}
+        initial={automation}
+        action={updateAutomation.bind(null, id)}
+      />
     </div>
   );
 }

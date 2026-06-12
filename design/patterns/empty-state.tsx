@@ -1,17 +1,23 @@
-// Teaching empty state (PRD §8: "Empty states teach"). Every list page uses
-// this dashed box; `title` bolds the first line when the state needs both a
-// headline and an explanation (e.g. the Runs page).
+import { Inbox } from "lucide-react";
+
+// Teaching empty state (PRD §8: "empty states teach"): centered icon circle,
+// bold title, quiet explanation. Render inside a Card.
 export function EmptyState({
+  icon,
   title,
   children,
 }: {
+  icon?: React.ReactNode;
   title?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2 rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-      {title && <p className="font-medium text-foreground">{title}</p>}
-      <p>{children}</p>
+    <div className="px-6 py-14 text-center">
+      <div className="mx-auto mb-3 grid h-9 w-9 place-items-center rounded-full bg-muted text-ink-3">
+        {icon ?? <Inbox className="h-4 w-4" />}
+      </div>
+      {title && <div className="text-sm font-semibold">{title}</div>}
+      <div className="mt-1 text-[13.5px] text-ink-2">{children}</div>
     </div>
   );
 }

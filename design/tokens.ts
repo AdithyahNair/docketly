@@ -1,25 +1,30 @@
 // Semantic design tokens. Single source of truth for every meaning-bearing
 // class string in the dashboard. Pages and components import from here;
-// raw color classes (bg-amber-100 etc.) should not appear in page code.
+// raw color classes should not appear in page code.
+//
+// Palette: warm Notion/Attio-style light theme from the design handoff
+// (Docketly Redesign.html). Color values live in app/globals.css; these
+// recipes reference them through the @theme color names.
 
 // ---------------------------------------------------------------------------
-// Tones: the five semantic colors. Every badge, banner, or accent maps a
-// domain state to a tone here, never to a palette color directly.
+// Tones: the five semantic colors, as soft pills (tinted bg + deep ink).
+// Every badge, chip, or accent maps a domain state to a tone here, never to
+// a palette color directly.
 // ---------------------------------------------------------------------------
 
 export const TONES = {
-  info: "bg-blue-100 text-blue-800 border-blue-200",
-  success: "bg-green-100 text-green-800 border-green-200",
-  warning: "bg-amber-100 text-amber-800 border-amber-200",
-  danger: "bg-red-100 text-red-800 border-red-200",
-  neutral: "bg-neutral-100 text-neutral-600 border-neutral-200",
+  info: "bg-status-blue-bg text-status-blue-ink",
+  success: "bg-status-green-bg text-status-green-ink",
+  warning: "bg-status-amber-bg text-status-amber-ink",
+  danger: "bg-status-red-bg text-status-red-ink",
+  neutral: "bg-muted text-ink-2",
 } as const;
 
 export type Tone = keyof typeof TONES;
 
 // ---------------------------------------------------------------------------
 // Domain state → tone. Notice statuses (lib/types.ts NoticeRow.status) and
-// automation run statuses (automation_runs.status) share one badge language:
+// automation run statuses (automation_runs.status) share one pill language:
 // blue = in flight, green = done, amber = needs a human, red = went wrong,
 // neutral = intentionally skipped.
 // ---------------------------------------------------------------------------
@@ -36,27 +41,36 @@ export const STATUS_TONE: Record<string, Tone> = {
   skipped: "neutral",
 };
 
-// Display overrides for statuses whose DB value isn't presentable as-is.
+// Display labels: sentence case per the redesign ("Needs review", "Sent").
 export const STATUS_LABEL: Record<string, string> = {
-  needs_review: "needs review",
+  classifying: "Classifying",
+  classified: "Classified",
+  needs_review: "Needs review",
+  failed: "Failed",
+  pending: "Pending",
+  sent: "Sent",
+  skipped: "Skipped",
 };
 
 // ---------------------------------------------------------------------------
-// Typography recipes. The dashboard uses exactly these text styles; new
-// pages should compose from this list before inventing another.
+// Typography recipes. Sizes are the design's exact px values.
 // ---------------------------------------------------------------------------
 
 export const TEXT = {
   /** h1 on every dashboard page */
-  pageTitle: "text-2xl font-semibold tracking-tight",
+  pageTitle: "text-[22px] font-semibold tracking-[-0.012em] leading-tight",
   /** the one-line explanation under every h1 */
-  pageSubtitle: "text-sm text-muted-foreground",
-  /** uppercase micro-label above a read-only field value */
-  fieldLabel: "text-xs font-medium uppercase tracking-wide text-muted-foreground",
+  pageSubtitle: "mt-[5px] max-w-[560px] text-sm text-ink-2",
+  /** form / read-only field label */
+  fieldLabel: "mb-1.5 block text-[13px] font-medium",
+  /** quiet helper line under a field or table */
+  fieldHint: "mt-1.5 text-[12.5px] text-ink-2",
   /** case numbers and other court identifiers */
-  identifier: "font-mono text-xs",
-  /** the AI's one-sentence reasoning, always set off in italics */
-  reasoning: "text-sm italic text-muted-foreground",
+  identifier: "font-mono text-[12.5px] tabular-nums",
+  /** card heading + its quiet description */
+  cardTitle: "text-sm font-semibold",
+  cardSub: "text-[13px] text-ink-2",
   /** raw notice text */
-  sourceText: "whitespace-pre-wrap rounded-md bg-muted/50 p-4 font-mono text-xs leading-relaxed",
+  sourceText:
+    "whitespace-pre-wrap rounded-lg border bg-raised p-4 font-mono text-[12.5px] leading-[1.85]",
 } as const;

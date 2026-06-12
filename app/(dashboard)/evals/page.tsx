@@ -1,7 +1,9 @@
 import { requireUser } from "@/lib/supabase-server";
 import { fmtDateTime } from "@/lib/format";
 import { NOTICE_TYPES } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TEXT } from "@/design/tokens";
+import { Card } from "@/components/ui/card";
+import { Callout } from "@/design/patterns/callout";
 import { EmptyState } from "@/design/patterns/empty-state";
 import { PageHeader } from "@/design/patterns/page-header";
 import {
@@ -26,6 +28,9 @@ interface EvalRun {
 
 const PASS_THRESHOLD = 0.85;
 
+const SUBTITLE =
+  "Classifier quality, measured against the labeled dataset. Review corrections grow the dataset, so every human fix becomes a regression test.";
+
 export default async function EvalsPage() {
   const { supabase } = await requireUser();
   const { data } = await supabase
@@ -38,13 +43,18 @@ export default async function EvalsPage() {
 
   if (!latest) {
     return (
-      <div className="space-y-6">
-        <Header />
-        <EmptyState title="No eval runs recorded yet.">
-          Run <code className="font-mono">npm run eval</code> (requires
-          ANTHROPIC_API_KEY) to score the live classifier against the labeled dataset.
-          Every review-queue correction grows the dataset.
-        </EmptyState>
+      <div>
+        <PageHeader title="Evals" subtitle={SUBTITLE} />
+        <Card className="overflow-hidden p-0 shadow-[0_1px_2px_rgba(28,26,21,0.04)]">
+          <EmptyState title="No eval runs recorded yet">
+            Run{" "}
+            <code className="rounded-[5px] bg-muted px-1.5 py-px font-mono text-xs text-ink">
+              npm run eval
+            </code>{" "}
+            (requires ANTHROPIC_API_KEY) to score the live classifier against the labeled
+            dataset.
+          </EmptyState>
+        </Card>
       </div>
     );
   }
@@ -66,33 +76,71 @@ export default async function EvalsPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <Header />
+    <div>
+      <PageHeader title="Evals" subtitle={SUBTITLE} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardDescription>Exact-match accuracy</CardDescription>
-            <CardTitle
-              className={cn("text-4xl", passed ? "text-green-700" : "text-destructive")}
+      <div className="grid items-start gap-5 lg:grid-cols-[1fr_1.55fr]">
+        <div className="flex flex-col gap-5">
+          <Card className="block p-5">
+            <div className={TEXT.cardTitle}>Exact-match accuracy</div>
+            <div
+              className={cn(
+                "my-2 text-[42px] font-semibold leading-[1.1] tracking-[-0.02em] tabular-nums",
+                passed ? "text-status-green-ink" : "text-status-red-ink"
+              )}
             >
               {(accuracy * 100).toFixed(1)}%
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            <p>
-              {passed ? "Passing" : "FAILING"} the {PASS_THRESHOLD * 100}% gate ·{" "}
-              {latest.dataset_size} examples · {latest.model}
-            </p>
-            <p>Last run {fmtDateTime(latest.created_at)}</p>
-          </CardContent>
-        </Card>
+            </div>
+            <div className="flex flex-wrap items-center gap-[7px] text-[13px] text-ink-2">
+              <span>
+                {passed ? "Passing" : "Failing"} the {PASS_THRESHOLD * 100}% gate
+              </span>
+              <span className="h-[3px] w-[3px] rounded-full bg-ink-3" />
+              <span>{latest.dataset_size} examples</span>
+              <span className="h-[3px] w-[3px] rounded-full bg-ink-3" />
+              <span className="font-mono text-xs">{latest.model}</span>
+            </div>
+            <div className="mt-1.5 text-[13px] text-ink-2">
+              Last run {fmtDateTime(latest.created_at)}
+            </div>
+          </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">Per-type precision / recall</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <Card className="block p-5">
+            <div className={TEXT.cardTitle}>Run history</div>
+            <div className={TEXT.cardSub}>
+              How to run:{" "}
+              <code className="rounded-[5px] bg-muted px-1.5 py-px font-mono text-xs text-ink">
+                npm run eval
+              </code>{" "}
+              — exits nonzero below {PASS_THRESHOLD * 100}%, so it can gate deploys.
+            </div>
+            <div className="my-4 flex h-[88px] items-end gap-2">
+              {[...runs].reverse().map((r) => {
+                const a = Number(r.accuracy);
+                return (
+                  <div
+                    key={r.id}
+                    title={`${(a * 100).toFixed(1)}% · ${fmtDateTime(r.created_at)}`}
+                    className={cn(
+                      "w-[26px] rounded-t-[5px] rounded-b-sm opacity-80",
+                      a >= PASS_THRESHOLD ? "bg-status-green-ink" : "bg-status-red-ink"
+                    )}
+                    style={{ height: `${Math.max(a * 100, 4)}%` }}
+                  />
+                );
+              })}
+            </div>
+            <p className={TEXT.fieldHint}>
+              {runs.length} recorded run{runs.length === 1 ? "" : "s"}, oldest → newest.
+            </p>
+          </Card>
+        </div>
+
+        <div className="flex flex-col gap-5">
+          <Card className="overflow-hidden p-0 shadow-[0_1px_2px_rgba(28,26,21,0.04)]">
+            <div className="p-5 pb-2">
+              <div className={TEXT.cardTitle}>Per-type precision / recall</div>
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -109,85 +157,47 @@ export default async function EvalsPage() {
                   const r = tp + fn ? tp / (tp + fn) : 0;
                   return (
                     <TableRow key={t}>
-                      <TableCell>{t}</TableCell>
-                      <TableCell className="text-right font-mono">{p.toFixed(2)}</TableCell>
-                      <TableCell className="text-right font-mono">{r.toFixed(2)}</TableCell>
-                      <TableCell className="text-right font-mono">{tp + fn}</TableCell>
+                      <TableCell className="font-medium">{t}</TableCell>
+                      <TableCell className={`text-right ${TEXT.identifier}`}>
+                        {p.toFixed(2)}
+                      </TableCell>
+                      <TableCell className={`text-right ${TEXT.identifier}`}>
+                        {r.toFixed(2)}
+                      </TableCell>
+                      <TableCell className={`text-right text-ink-2 ${TEXT.identifier}`}>
+                        {tp + fn}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-      </div>
+          </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Confusion</CardTitle>
-            <CardDescription>Off-diagonal cells: expected → predicted.</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <Card className="block p-5">
+            <div className={TEXT.cardTitle}>Confusion</div>
+            <div className={`${TEXT.cardSub} mb-3.5`}>
+              Off-diagonal cells: expected → predicted.
+            </div>
             {confusedPairs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
+              <Callout>
                 No confusions — every example classified as its expected type.
-              </p>
+              </Callout>
             ) : (
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1 text-[13.5px]">
                 {confusedPairs.map(({ expected, predicted, count }) => (
                   <li key={`${expected}-${predicted}`}>
                     <span className="font-medium">{expected}</span>
-                    <span className="text-muted-foreground"> classified as </span>
+                    <span className="text-ink-2"> classified as </span>
                     <span className="font-medium">{predicted}</span>
-                    <span className="font-mono text-muted-foreground"> ×{count}</span>
+                    <span className={`text-ink-2 ${TEXT.identifier}`}> ×{count}</span>
                   </li>
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Run history</CardTitle>
-            <CardDescription>
-              How to run: <code className="font-mono">npm run eval</code> — exits nonzero
-              below {PASS_THRESHOLD * 100}%, so it can gate deploys.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex h-24 items-end gap-1">
-              {[...runs].reverse().map((r) => {
-                const a = Number(r.accuracy);
-                return (
-                  <div
-                    key={r.id}
-                    title={`${(a * 100).toFixed(1)}% · ${fmtDateTime(r.created_at)}`}
-                    className={cn(
-                      "w-6 rounded-t",
-                      a >= PASS_THRESHOLD ? "bg-green-500" : "bg-red-400"
-                    )}
-                    style={{ height: `${Math.max(a * 100, 4)}%` }}
-                  />
-                );
-              })}
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {runs.length} recorded run{runs.length === 1 ? "" : "s"}, oldest → newest.
-            </p>
-          </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
-  );
-}
-
-function Header() {
-  return (
-    <PageHeader
-      title="Evals"
-      subtitle="Classifier quality, measured against the labeled dataset. Review corrections grow the dataset, so every human fix becomes a regression test."
-    />
   );
 }

@@ -5,9 +5,10 @@ import { X } from "lucide-react";
 import { NOTICE_TYPES, type AutomationRow, type Recipient } from "@/lib/types";
 import { renderTemplate, type TokenContext } from "@/lib/templates";
 import type { AutomationFormState } from "@/app/(dashboard)/automations/actions";
-import { Badge } from "@/components/ui/badge";
+import { TEXT } from "@/design/tokens";
+import { PageHeader } from "@/design/patterns/page-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 // Sample context matches the seeded demo case so the preview reads real.
 const SAMPLE_CONTEXT: TokenContext = {
@@ -39,9 +41,11 @@ function recipientLabel(r: Recipient) {
 }
 
 export function AutomationForm({
+  title,
   initial,
   action,
 }: {
+  title: string;
   initial?: AutomationRow;
   action: (prev: AutomationFormState, formData: FormData) => Promise<AutomationFormState>;
 }) {
@@ -73,200 +77,234 @@ export function AutomationForm({
     setEmailDraft("");
   }
 
+  const renderedSubject = renderTemplate(subject, SAMPLE_CONTEXT);
+  const renderedBody = renderTemplate(body, SAMPLE_CONTEXT);
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-      <form action={formAction} className="space-y-6">
-        <input type="hidden" name="recipients" value={JSON.stringify(recipients)} />
+    <form action={formAction}>
+      <input type="hidden" name="recipients" value={JSON.stringify(recipients)} />
+      {enabled && <input type="hidden" name="enabled" value="on" />}
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              name="name"
-              required
-              defaultValue={initial?.name}
-              placeholder="Hearing notice to client"
-            />
+      <PageHeader
+        title={title}
+        actions={
+          <div className="flex items-center gap-2.5">
+            <span className="text-[13px] font-medium text-ink-2">
+              {enabled ? "Enabled" : "Disabled"}
+            </span>
+            <Switch checked={enabled} onCheckedChange={setEnabled} />
           </div>
-          <div className="flex items-center gap-2 pt-6">
-            <Switch
-              id="enabled"
-              name="enabled"
-              checked={enabled}
-              onCheckedChange={setEnabled}
-            />
-            <Label htmlFor="enabled">{enabled ? "Enabled" : "Disabled"}</Label>
-          </div>
-        </div>
+        }
+      />
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2">
-            <Label>Notice type</Label>
-            <Select
-              name="match_notice_type"
-              defaultValue={initial?.match_notice_type}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="When this arrives…" />
-              </SelectTrigger>
-              <SelectContent>
-                {NOTICE_TYPES.filter((t) => t !== "Other").map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Chapter filter</Label>
-            <Select
-              name="match_chapter"
-              defaultValue={initial?.match_chapter ? String(initial.match_chapter) : "any"}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any chapter</SelectItem>
-                <SelectItem value="7">Chapter 7</SelectItem>
-                <SelectItem value="13">Chapter 13</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="match_judge">Judge filter (initials)</Label>
-            <Input
-              id="match_judge"
-              name="match_judge"
-              defaultValue={initial?.match_judge ?? ""}
-              placeholder="Any judge"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Recipients</Label>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant={hasRole("client") ? "default" : "outline"}
-              onClick={() => toggleRole("client")}
-            >
-              Client
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={hasRole("attorney") ? "default" : "outline"}
-              onClick={() => toggleRole("attorney")}
-            >
-              Attorney
-            </Button>
-            <Input
-              className="w-56"
-              placeholder="Add email and press Enter"
-              value={emailDraft}
-              onChange={(e) => setEmailDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addEmail();
-                }
-              }}
-            />
-          </div>
-          {recipients.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {recipients.map((r, i) => (
-                <Badge key={i} variant="secondary" className="gap-1">
-                  {recipientLabel(r)}
-                  <button
-                    type="button"
-                    onClick={() => setRecipients((prev) => prev.filter((_, j) => j !== i))}
-                    aria-label={`Remove ${recipientLabel(r)}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
+      <div className="grid items-start gap-5 lg:grid-cols-[1.4fr_1fr]">
+        <Card className="block p-5">
+          <div className="grid grid-cols-2 gap-x-5 gap-y-[18px]">
+            <div className="col-span-2">
+              <Label htmlFor="name" className={TEXT.fieldLabel}>
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                required
+                defaultValue={initial?.name}
+                placeholder="Hearing notice to client"
+              />
             </div>
+            <div>
+              <Label className={TEXT.fieldLabel}>Notice type</Label>
+              <Select
+                name="match_notice_type"
+                defaultValue={initial?.match_notice_type}
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="When this arrives…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NOTICE_TYPES.filter((t) => t !== "Other").map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className={TEXT.fieldLabel}>Chapter filter</Label>
+              <Select
+                name="match_chapter"
+                defaultValue={initial?.match_chapter ? String(initial.match_chapter) : "any"}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any chapter</SelectItem>
+                  <SelectItem value="7">Chapter 7</SelectItem>
+                  <SelectItem value="13">Chapter 13</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="match_judge" className={TEXT.fieldLabel}>
+                Judge filter (initials)
+              </Label>
+              <Input
+                id="match_judge"
+                name="match_judge"
+                defaultValue={initial?.match_judge ?? ""}
+                placeholder="Any judge"
+              />
+            </div>
+            <div className="col-span-2">
+              <Label className={TEXT.fieldLabel}>Recipients</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleRole("client")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border bg-background px-[13px] py-[5px] text-[13px] font-medium transition-colors",
+                    hasRole("client")
+                      ? "border-brand/45 bg-brand/10 text-brand"
+                      : "border-input text-ink-2 hover:bg-sidebar"
+                  )}
+                >
+                  Client
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleRole("attorney")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border bg-background px-[13px] py-[5px] text-[13px] font-medium transition-colors",
+                    hasRole("attorney")
+                      ? "border-brand/45 bg-brand/10 text-brand"
+                      : "border-input text-ink-2 hover:bg-sidebar"
+                  )}
+                >
+                  Attorney
+                </button>
+                <Input
+                  className="w-60 flex-auto"
+                  placeholder="Add email and press Enter"
+                  value={emailDraft}
+                  onChange={(e) => setEmailDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addEmail();
+                    }
+                  }}
+                />
+              </div>
+              {recipients.filter((r) => r.type === "email").length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {recipients.map((r, i) =>
+                    r.type === "email" ? (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium"
+                      >
+                        {recipientLabel(r)}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setRecipients((prev) => prev.filter((_, j) => j !== i))
+                          }
+                          aria-label={`Remove ${recipientLabel(r)}`}
+                          className="text-ink-3 hover:text-ink"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ) : null
+                  )}
+                </div>
+              )}
+              <p className={TEXT.fieldHint}>
+                Roles resolve against the matched case: Client → client email, Attorney →
+                attorney email.
+              </p>
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="subject_template" className={TEXT.fieldLabel}>
+                Subject template
+              </Label>
+              <Input
+                id="subject_template"
+                name="subject_template"
+                required
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Hearing scheduled in your case {{case_number}}"
+              />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="body_template" className={TEXT.fieldLabel}>
+                Body template
+              </Label>
+              <Textarea
+                id="body_template"
+                name="body_template"
+                required
+                rows={7}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder={"Dear {{client_name}},\n\n…\n\n{{firm_name}}"}
+                className="min-h-[120px] font-mono text-[12.5px] leading-[1.7]"
+              />
+            </div>
+          </div>
+          {state.error && (
+            <p className="mt-4 text-[13px] font-medium text-destructive">{state.error}</p>
           )}
-          <p className="text-xs text-muted-foreground">
-            Roles resolve against the matched case: Client → client email, Attorney →
-            attorney email.
-          </p>
-        </div>
+          <div className="mt-5">
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving…" : initial ? "Save changes" : "Create automation"}
+            </Button>
+          </div>
+        </Card>
 
-        <div className="space-y-2">
-          <Label htmlFor="subject_template">Subject template</Label>
-          <Input
-            id="subject_template"
-            name="subject_template"
-            required
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="Hearing scheduled in your case {{case_number}}"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="body_template">Body template</Label>
-          <Textarea
-            id="body_template"
-            name="body_template"
-            required
-            rows={10}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder={"Dear {{client_name}},\n\n…\n\n{{firm_name}}"}
-          />
-        </div>
-
-        {state.error && <p className="text-sm text-destructive">{state.error}</p>}
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : initial ? "Save changes" : "Create automation"}
-        </Button>
-      </form>
-
-      <div className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Token reference</CardTitle>
-            <CardDescription>
+        <div className="flex flex-col gap-5">
+          <Card className="block p-5">
+            <div className={TEXT.cardTitle}>Token reference</div>
+            <div className={`${TEXT.cardSub} mb-3.5`}>
               Tokens render from the matched case and classification. Unknown tokens
               render empty, never as literal braces.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-1.5">
-            {TOKENS.map((t) => (
-              <div key={t} className="flex justify-between gap-2 text-xs">
-                <code className="font-mono">{`{{${t}}}`}</code>
-                <span className="truncate text-muted-foreground">{SAMPLE_CONTEXT[t]}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Preview</CardTitle>
-            <CardDescription>Rendered against the sample case above.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="text-sm font-medium">
-              {renderTemplate(subject, SAMPLE_CONTEXT) || (
-                <span className="text-muted-foreground">(empty subject)</span>
-              )}
             </div>
-            <pre className="whitespace-pre-wrap rounded-md bg-muted/50 p-3 font-sans text-xs leading-relaxed">
-              {renderTemplate(body, SAMPLE_CONTEXT) || "(empty body)"}
-            </pre>
-          </CardContent>
-        </Card>
+            <div>
+              {TOKENS.map((t) => (
+                <div
+                  key={t}
+                  className="flex items-baseline justify-between gap-3 border-b border-row-line py-[5.5px] last:border-b-0"
+                >
+                  <code className="font-mono text-xs text-brand">{`{{${t}}}`}</code>
+                  <span className="overflow-hidden text-ellipsis whitespace-nowrap text-right text-[12.5px] text-ink-2">
+                    {SAMPLE_CONTEXT[t]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="block p-5">
+            <div className={TEXT.cardTitle}>Preview</div>
+            <div className={`${TEXT.cardSub} mb-3.5`}>
+              Rendered against the sample case above.
+            </div>
+            <div className="whitespace-pre-wrap rounded-lg border bg-raised px-[18px] py-4 text-[13px] leading-[1.85] text-ink-2">
+              {renderedSubject ? (
+                <span className="font-semibold text-ink">{renderedSubject}</span>
+              ) : (
+                <span className="italic">(empty subject)</span>
+              )}
+              {"\n\n"}
+              {renderedBody || <span className="italic">(empty body)</span>}
+            </div>
+          </Card>
+        </div>
       </div>
-    </div>
+    </form>
   );
 }
