@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+next-env.d.ts
+
+# env — real secrets live here
+.env.local
+.env*.local
+
+# tooling artifacts
+.playwright-mcp/
+*.tsbuildinfo
+
+# os
+.DS_Store
