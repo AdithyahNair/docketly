@@ -1,26 +1,14 @@
 import { Badge } from "@/components/ui/badge";
+import { STATUS_LABEL, STATUS_TONE, TONES } from "@/design/tokens";
 import { cn } from "@/lib/utils";
 
-const STYLES: Record<string, string> = {
-  // notice statuses
-  classifying: "bg-blue-100 text-blue-800 border-blue-200",
-  classified: "bg-green-100 text-green-800 border-green-200",
-  needs_review: "bg-amber-100 text-amber-800 border-amber-200",
-  failed: "bg-red-100 text-red-800 border-red-200",
-  // run statuses
-  sent: "bg-green-100 text-green-800 border-green-200",
-  pending: "bg-blue-100 text-blue-800 border-blue-200",
-  skipped: "bg-neutral-100 text-neutral-600 border-neutral-200",
-};
-
-const LABELS: Record<string, string> = {
-  needs_review: "needs review",
-};
-
+// The single door for rendering a notice or run status. Colors and labels
+// come from design/tokens.ts; see design/README.md.
 export function StatusBadge({ status }: { status: string }) {
+  const tone = STATUS_TONE[status];
   return (
-    <Badge variant="outline" className={cn("font-medium", STYLES[status])}>
-      {LABELS[status] ?? status}
+    <Badge variant="outline" className={cn("font-medium", tone && TONES[tone])}>
+      {STATUS_LABEL[status] ?? status}
     </Badge>
   );
 }

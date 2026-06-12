@@ -6,8 +6,8 @@ import { gateFailures } from "@/lib/gates";
 import { fmtConfidence } from "@/lib/format";
 import type { Classification } from "@/lib/types";
 import { ReviewForm } from "@/components/review-form";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GateBadge } from "@/design/patterns/gate-badge";
 import { approveNotice, markNoticeFailed } from "../actions";
 
 export default async function ReviewDetailPage({
@@ -50,13 +50,7 @@ export default async function ReviewDetailPage({
         <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
           <span>Held because:</span>
           {failures.map((f) => (
-            <Badge
-              key={f}
-              variant="outline"
-              className="border-amber-200 bg-amber-50 text-amber-800"
-            >
-              {f}
-            </Badge>
+            <GateBadge key={f} failure={f} />
           ))}
         </div>
       </div>

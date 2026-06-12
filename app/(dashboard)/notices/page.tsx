@@ -5,6 +5,8 @@ import { fmtConfidence, fmtDateTime } from "@/lib/format";
 import type { Classification } from "@/lib/types";
 import { StatusBadge } from "@/components/status-badge";
 import { UploadButton } from "@/components/upload-button";
+import { EmptyState } from "@/design/patterns/empty-state";
+import { PageHeader } from "@/design/patterns/page-header";
 import {
   Table,
   TableBody,
@@ -46,15 +48,11 @@ export default async function NoticesPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Notices</h1>
-          <p className="text-sm text-muted-foreground">
-            Every notice ingested from the feed or uploaded by hand.
-          </p>
-        </div>
-        <UploadButton />
-      </div>
+      <PageHeader
+        title="Notices"
+        subtitle="Every notice ingested from the feed or uploaded by hand."
+        actions={<UploadButton />}
+      />
 
       <div className="flex gap-1 border-b">
         {FILTERS.map((f) => (
@@ -74,10 +72,10 @@ export default async function NoticesPage({
       </div>
 
       {notices.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
+        <EmptyState>
           No notices yet. Run <code className="font-mono">npm run simulate-feed</code> to
           ingest demo notices from the simulated PACER feed, or upload a PDF.
-        </div>
+        </EmptyState>
       ) : (
         <Table>
           <TableHeader>

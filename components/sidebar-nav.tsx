@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ClipboardCheck, Gauge, Inbox, ListChecks, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { TONES } from "@/design/tokens";
 
 const ITEMS = [
   { href: "/notices", label: "Notices", icon: Inbox },
@@ -34,7 +35,7 @@ export function SidebarNav({ reviewCount }: { reviewCount: number }) {
             <Icon className="h-4 w-4" />
             {label}
             {label === "Review" && reviewCount > 0 && (
-              <Badge variant="secondary" className="ml-auto bg-amber-100 text-amber-800">
+              <Badge variant="secondary" className={cn("ml-auto", TONES.warning)}>
                 {reviewCount}
               </Badge>
             )}

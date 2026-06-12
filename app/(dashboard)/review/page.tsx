@@ -11,7 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/design/patterns/empty-state";
+import { GateBadge } from "@/design/patterns/gate-badge";
+import { PageHeader } from "@/design/patterns/page-header";
 
 interface QueueRow {
   id: string;
@@ -31,18 +33,13 @@ export default async function ReviewPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Review queue</h1>
-        <p className="text-sm text-muted-foreground">
-          Notices the AI wasn&apos;t confident about. Approving one fires automations on
-          your corrected data.
-        </p>
-      </div>
+      <PageHeader
+        title="Review queue"
+        subtitle="Notices the AI wasn't confident about. Approving one fires automations on your corrected data."
+      />
 
       {queue.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-          Nothing needs your attention.
-        </div>
+        <EmptyState>Nothing needs your attention.</EmptyState>
       ) : (
         <Table>
           <TableHeader>
@@ -77,13 +74,7 @@ export default async function ReviewPage() {
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {gateFailures(c, n.case_id).map((f) => (
-                        <Badge
-                          key={f}
-                          variant="outline"
-                          className="border-amber-200 bg-amber-50 text-amber-800"
-                        >
-                          {f}
-                        </Badge>
+                        <GateBadge key={f} failure={f} />
                       ))}
                     </div>
                   </TableCell>

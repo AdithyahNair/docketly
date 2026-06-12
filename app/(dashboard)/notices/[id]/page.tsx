@@ -16,18 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Field } from "@/design/patterns/field";
 import { retryNotice } from "../actions";
-
-function Field({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div>
-      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {label}
-      </div>
-      <div className="text-sm">{value ?? "—"}</div>
-    </div>
-  );
-}
 
 export default async function NoticeDetailPage({
   params,

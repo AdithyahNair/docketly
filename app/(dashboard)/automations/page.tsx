@@ -5,6 +5,8 @@ import type { AutomationRow } from "@/lib/types";
 import { StatusBadge } from "@/components/status-badge";
 import { AutomationToggle } from "@/components/automation-toggle";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/design/patterns/empty-state";
+import { PageHeader } from "@/design/patterns/page-header";
 import {
   Table,
   TableBody,
@@ -37,23 +39,21 @@ export default async function AutomationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Automations</h1>
-          <p className="text-sm text-muted-foreground">
-            When a classified notice matches a rule, the rule emails its recipients.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/automations/new">New automation</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title="Automations"
+        subtitle="When a classified notice matches a rule, the rule emails its recipients."
+        actions={
+          <Button asChild>
+            <Link href="/automations/new">New automation</Link>
+          </Button>
+        }
+      />
 
       {automations.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
+        <EmptyState>
           No automations yet. Create one to start emailing clients and attorneys when
           notices arrive.
-        </div>
+        </EmptyState>
       ) : (
         <Table>
           <TableHeader>

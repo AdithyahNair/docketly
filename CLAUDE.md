@@ -16,6 +16,13 @@ source of truth for scope and design decisions.
 
 Path alias: `@/*` maps to the repo root (see tsconfig.json), e.g. `@/lib/types`.
 
+**Design system** (`design/README.md`): theme in `app/globals.css`, shadcn
+primitives in `components/ui/`, semantic tokens in `design/tokens.ts`
+(tones, status→tone map, typography recipes), shared patterns in
+`design/patterns/` (PageHeader, EmptyState, Field, GateBadge). Render
+statuses only via `components/status-badge.tsx`; no raw palette classes in
+page code.
+
 ## Already implemented — do not regenerate or refactor
 
 The core pipeline is working, typechecked, and tested. Build around it:

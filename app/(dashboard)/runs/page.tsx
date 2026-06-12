@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/supabase-server";
 import { fmtDateTime } from "@/lib/format";
 import type { Classification, Recipient } from "@/lib/types";
 import { StatusBadge } from "@/components/status-badge";
+import { EmptyState } from "@/design/patterns/empty-state";
+import { PageHeader } from "@/design/patterns/page-header";
 import {
   Table,
   TableBody,
@@ -43,23 +45,18 @@ export default async function RunsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Runs</h1>
-        <p className="text-sm text-muted-foreground">
-          Every automation fire: what sent, what failed, and why.
-        </p>
-      </div>
+      <PageHeader
+        title="Runs"
+        subtitle="Every automation fire: what sent, what failed, and why."
+      />
 
       {runs.length === 0 ? (
-        <div className="space-y-2 rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">No runs yet.</p>
-          <p>
-            Runs appear when a classified notice matches an enabled automation: the rule
-            resolves its recipients, renders its templates, and sends the email — each
-            attempt is recorded here, sent or failed. The same notice never triggers the
-            same rule twice.
-          </p>
-        </div>
+        <EmptyState title="No runs yet.">
+          Runs appear when a classified notice matches an enabled automation: the rule
+          resolves its recipients, renders its templates, and sends the email — each
+          attempt is recorded here, sent or failed. The same notice never triggers the
+          same rule twice.
+        </EmptyState>
       ) : (
         <Table>
           <TableHeader>

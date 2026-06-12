@@ -2,6 +2,8 @@ import { requireUser } from "@/lib/supabase-server";
 import { fmtDateTime } from "@/lib/format";
 import { NOTICE_TYPES } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/design/patterns/empty-state";
+import { PageHeader } from "@/design/patterns/page-header";
 import {
   Table,
   TableBody,
@@ -38,14 +40,11 @@ export default async function EvalsPage() {
     return (
       <div className="space-y-6">
         <Header />
-        <div className="space-y-2 rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">No eval runs recorded yet.</p>
-          <p>
-            Run <code className="font-mono">npm run eval</code> (requires
-            ANTHROPIC_API_KEY) to score the live classifier against the labeled dataset.
-            Every review-queue correction grows the dataset.
-          </p>
-        </div>
+        <EmptyState title="No eval runs recorded yet.">
+          Run <code className="font-mono">npm run eval</code> (requires
+          ANTHROPIC_API_KEY) to score the live classifier against the labeled dataset.
+          Every review-queue correction grows the dataset.
+        </EmptyState>
       </div>
     );
   }
@@ -186,12 +185,9 @@ export default async function EvalsPage() {
 
 function Header() {
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight">Evals</h1>
-      <p className="text-sm text-muted-foreground">
-        Classifier quality, measured against the labeled dataset. Review corrections grow
-        the dataset, so every human fix becomes a regression test.
-      </p>
-    </div>
+    <PageHeader
+      title="Evals"
+      subtitle="Classifier quality, measured against the labeled dataset. Review corrections grow the dataset, so every human fix becomes a regression test."
+    />
   );
 }
