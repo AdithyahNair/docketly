@@ -1,0 +1,67 @@
+[
+  {
+    "id": "hearing-ch13-01",
+    "text": "UNITED STATES BANKRUPTCY COURT\nSouthern District of New York\n\nIn re: Maria T. Alvarez, Debtor\nCase No. 26-10342-MEW          Chapter 13\n\nNOTICE OF HEARING\n\nPLEASE TAKE NOTICE that a hearing on confirmation of the debtor's Chapter 13 plan will be held before the Honorable Judge M.E. Wiles on July 9, 2026 at 10:00 AM in Courtroom 617, One Bowling Green, New York, NY 10004.\n\nObjections to confirmation must be filed no later than seven days before the hearing date.",
+    "expected": { "notice_type": "Notice of Hearing", "chapter": 13, "case_number": "26-10342", "judge_initials": "MEW" }
+  },
+  {
+    "id": "341-ch7-01",
+    "text": "UNITED STATES BANKRUPTCY COURT\nEastern District of New York\n\nIn re: Devon Carter, Debtor\nCase No. 26-41877-JMM          Chapter 7\n\nNOTICE OF CHAPTER 7 BANKRUPTCY CASE, MEETING OF CREDITORS, AND DEADLINES\n\nThe meeting of creditors under 11 U.S.C. Section 341(a) will be held on June 30, 2026 at 9:30 AM via telephonic appearance. Dial-in: (877) 555-0140, code 4421987.\n\nThe debtor must appear and be examined under oath. Creditors may attend but are not required to do so.",
+    "expected": { "notice_type": "Notice of 341 Meeting", "chapter": 7, "case_number": "26-41877", "judge_initials": "JMM" }
+  },
+  {
+    "id": "discharge-ch7-01",
+    "text": "UNITED STATES BANKRUPTCY COURT\nDistrict of New Jersey\n\nIn re: Samuel and Rita Okafor, Debtors\nCase No. 25-29914-ABA         Chapter 7\n\nORDER OF DISCHARGE\n\nIT IS ORDERED: A discharge under 11 U.S.C. Section 727 is granted to the debtors. Collection of discharged debts is prohibited. Creditors cannot collect from the debtors personally on discharged debts.\n\n/s/ Andrew B. Altenburg, Jr.\nUnited States Bankruptcy Judge",
+    "expected": { "notice_type": "Order of Discharge", "chapter": 7, "case_number": "25-29914", "judge_initials": "ABA" }
+  },
+  {
+    "id": "dismissal-ch13-01",
+    "text": "UNITED STATES BANKRUPTCY COURT\nSouthern District of Florida\n\nIn re: Kelly Nguyen, Debtor\nCase No. 26-13320-LMI         Chapter 13\n\nORDER DISMISSING CASE\n\nThe debtor having failed to make plan payments as required, and upon the Trustee's motion to dismiss, IT IS ORDERED that this case is DISMISSED without prejudice. The automatic stay is terminated.\n\n/s/ Laurel M. Isicoff\nUnited States Bankruptcy Judge",
+    "expected": { "notice_type": "Order of Dismissal", "chapter": 13, "case_number": "26-13320", "judge_initials": "LMI" }
+  },
+  {
+    "id": "deadline-ch7-01",
+    "text": "UNITED STATES BANKRUPTCY COURT\nNorthern District of Illinois\n\nIn re: Harold Brewster, Debtor\nCase No. 26-07215-DRC         Chapter 7\n\nNOTICE OF DEADLINE TO FILE PROOFS OF CLAIM\n\nNOTICE IS GIVEN that assets may be available for distribution. Creditors who wish to share in any distribution must file a proof of claim on or before September 14, 2026. Claims filed after the deadline will not receive distribution except as permitted by law.",
+    "expected": { "notice_type": "Notice of Deadline", "chapter": 7, "case_number": "26-07215", "judge_initials": "DRC" }
+  },
+  {
+    "id": "mfr-ch13-01",
+    "text": "UNITED STATES BANKRUPTCY COURT\nCentral District of California\n\nIn re: Joanna Reyes, Debtor\nCase No. 26-11458-SK          Chapter 13\n\nMOTION FOR RELIEF FROM THE AUTOMATIC STAY\n\nSecured creditor Pacific Lending Trust moves this Court for an order granting relief from the automatic stay of 11 U.S.C. Section 362(a) with respect to real property located at 1822 Verdugo Rd, Glendale, CA, on the grounds that the debtor has failed to make post-petition mortgage payments for four consecutive months.",
+    "expected": { "notice_type": "Motion for Relief from Stay", "chapter": 13, "case_number": "26-11458", "judge_initials": "SK" }
+  },
+  {
+    "id": "hearing-ch7-02",
+    "text": "UNITED STATES BANKRUPTCY COURT\nDistrict of Massachusetts\n\nIn re: Patrick Doyle, Debtor\nCase No. 26-10881-JEB         Chapter 7\n\nNOTICE OF HEARING ON TRUSTEE'S MOTION TO SELL\n\nA hearing on the Trustee's motion to sell estate property free and clear of liens will be held on August 3, 2026 at 2:00 PM before the Honorable Janet E. Bostwick, John W. McCormack Post Office and Court House, 5 Post Office Square, Boston, MA.",
+    "expected": { "notice_type": "Notice of Hearing", "chapter": 7, "case_number": "26-10881", "judge_initials": "JEB" }
+  },
+  {
+    "id": "341-ch13-02",
+    "text": "UNITED STATES BANKRUPTCY COURT\nWestern District of Texas\n\nIn re: Brianna Holt, Debtor\nCase No. 26-50677-CAG         Chapter 13\n\nNOTICE OF MEETING OF CREDITORS\n\nThe Section 341(a) meeting of creditors is scheduled for July 21, 2026 at 11:00 AM, Hipolito F. Garcia Federal Building, Room 333, San Antonio, TX. The debtor must bring photo identification and proof of social security number.",
+    "expected": { "notice_type": "Notice of 341 Meeting", "chapter": 13, "case_number": "26-50677", "judge_initials": "CAG" }
+  },
+  {
+    "id": "discharge-ch13-02",
+    "text": "UNITED STATES BANKRUPTCY COURT\nDistrict of Arizona\n\nIn re: Miguel Santos, Debtor\nCase No. 23-04412-BKM        Chapter 13\n\nORDER OF DISCHARGE AFTER COMPLETION OF CHAPTER 13 PLAN\n\nThe debtor having completed all payments under the confirmed plan, IT IS ORDERED that the debtor is granted a discharge under 11 U.S.C. Section 1328(a).\n\n/s/ Brenda K. Martin\nUnited States Bankruptcy Judge",
+    "expected": { "notice_type": "Order of Discharge", "chapter": 13, "case_number": "23-04412", "judge_initials": "BKM" }
+  },
+  {
+    "id": "deadline-ch13-02",
+    "text": "UNITED STATES BANKRUPTCY COURT\nMiddle District of Tennessee\n\nIn re: Angela Pruitt, Debtor\nCase No. 26-02156-RM         Chapter 13\n\nNOTICE OF DEADLINE FOR FILING OBJECTIONS TO CONFIRMATION\n\nObjections to confirmation of the debtor's proposed Chapter 13 plan must be filed and served no later than August 28, 2026. Absent timely objection, the plan may be confirmed without further notice or hearing.",
+    "expected": { "notice_type": "Notice of Deadline", "chapter": 13, "case_number": "26-02156", "judge_initials": "RM" }
+  },
+  {
+    "id": "mfr-ch7-02",
+    "text": "UNITED STATES BANKRUPTCY COURT\nEastern District of Michigan\n\nIn re: Curtis Webb, Debtor\nCase No. 26-30901-DOF        Chapter 7\n\nMOTION FOR RELIEF FROM STAY (VEHICLE)\n\nMovant GreatLakes Auto Finance requests relief from the automatic stay as to a 2022 Honda CR-V, VIN 7FARW2H5XNE004821, asserting lack of adequate protection and debtor default on three post-petition payments.",
+    "expected": { "notice_type": "Motion for Relief from Stay", "chapter": 7, "case_number": "26-30901", "judge_initials": "DOF" }
+  },
+  {
+    "id": "ambiguous-01",
+    "text": "U S BANKR CT\nre: dckt entry 47\n##OCR QUALITY LOW##\nn0tice of  st@tus conf?rence / or possibly trustee rept -- text illegible --\ncase n0. 2 6 - 1 0 ? 4 2\nchapter unclear\nappear date [smudged]",
+    "expected": { "notice_type": "Other", "chapter": null, "case_number": null, "judge_initials": null }
+  },
+  {
+    "id": "hearing-ch13-03",
+    "text": "UNITED STATES BANKRUPTCY COURT\nSouthern District of New York\n\nIn re: Thomas Greer, Debtor\nCase No. 26-10509-MEW        Chapter 13\n\nNOTICE OF ADJOURNED HEARING\n\nPLEASE TAKE NOTICE that the hearing previously scheduled on the debtor's motion to modify plan is ADJOURNED to September 2, 2026 at 11:30 AM before Judge M.E. Wiles, Courtroom 617, One Bowling Green, New York, NY.",
+    "expected": { "notice_type": "Notice of Hearing", "chapter": 13, "case_number": "26-10509", "judge_initials": "MEW" }
+  }
+]
