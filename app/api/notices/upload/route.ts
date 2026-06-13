@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { userClient } from "@/lib/supabase-server";
 import { adminClient } from "@/lib/supabase";
 import { contentHash } from "@/lib/hash";
 import { inngest } from "@/inngest/client";
 
 export async function POST(req: NextRequest) {
+  // Authenticated uploads only. An open endpoint here would let anyone inject
+  // notices into a firm — spending classification budget and potentially
+  // firing real client emails. The notice is scoped to the caller's own firm
+  // from their verified session, never to "whichever firm is first".
+  const auth = await userClient();
+  const {
+    data: { user },
+  } = await auth.auth.getUser();
+  const firmId = user?.app_metadata?.firm_id as string | undefined;
+  if (!user || !firmId) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) {
@@ -22,17 +36,18 @@ export async function POST(req: NextRequest) {
   }
 
   const db = adminClient();
-  const { data: firm } = await db.from("firms").select("id").limit(1).single();
-  if (!firm) return NextResponse.json({ error: "no firm configured" }, { status: 500 });
 
-  const pdfPath = `notices/${Date.now()}-${file.name}`;
+  // Sanitize the client-supplied filename to a safe storage key segment and
+  // namespace stored PDFs by firm.
+  const safeName = (file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100) || "upload") + "";
+  const pdfPath = `notices/${firmId}/${Date.now()}-${safeName}`;
   await db.storage.from("notices").upload(pdfPath, buffer, { contentType: "application/pdf" });
 
   const effectiveText = text || `[unextractable PDF: ${file.name}]`;
   const { data: notice } = await db
     .from("notices")
     .insert({
-      firm_id: firm.id,
+      firm_id: firmId,
       source: "upload",
       pdf_path: pdfPath,
       raw_text: effectiveText,

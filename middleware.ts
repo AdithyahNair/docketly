@@ -36,6 +36,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Pipeline API routes authenticate themselves (HMAC, Inngest signing key).
+  // API routes authenticate themselves (ingest: HMAC, upload: session,
+  // inngest: signing key), so middleware skips /api.
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|ico)$).*)"],
 };
